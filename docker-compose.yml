@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: ecopilot_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ecopilot_client_ai
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/ecopilot
+      - JWT_SECRET=supersecretjwtkeythatisreallylongandsecure123!
+      - GEMINI_API_KEY=dummy_api_key
+      - ENVIRONMENT=development
+    depends_on:
+      - mongodb
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecopilot_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/ecopilot
+      - JWT_SECRET=supersecretjwtkeythatisreallylongandsecure123!
+      - AI_SERVICE_URL=http://client:8001
+      - ENVIRONMENT=development
+      - PORT=8000
+    depends_on:
+      - mongodb
+      - client
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecopilot_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_data:
