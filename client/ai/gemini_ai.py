@@ -149,6 +149,13 @@ def _get_chat_cache_key(chat_history: list, new_message: str) -> str:
 
 # ── Model name – use the widely-available flash model ─────────────────────────
 _MODEL = "gemini-2.5-flash"
+_MODEL_QUEUE = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.5-pro",
+    "gemini-2.0-flash-lite",
+    "gemini-flash-latest"
+]
 _RATE_LIMIT_KEYWORDS = ("429", "quota", "resource_exhausted", "rate limit", "too many")
 
 # Retry configuration constants
@@ -210,6 +217,30 @@ class GeminiAIService:
                 await asyncio.sleep(backoff)
                 backoff *= 2
 
+    async def _generate_content_with_fallback(self, contents, config=None) -> str:
+        """
+        Generates content trying models in the fallback queue one by one.
+        """
+        last_exc = None
+        for model in _MODEL_QUEUE:
+            try:
+                # Execute with retry
+                response = await self._execute_with_retry(
+                    self._client.models.generate_content,
+                    model=model,
+                    contents=contents,
+                    config=config,
+                )
+                logger.info(f"Successfully generated content using model: {model}")
+                return response.text or ""
+            except Exception as exc:
+                logger.warning(f"Failed to generate content with model {model}: {exc}. Trying fallback...")
+                last_exc = exc
+        
+        if last_exc:
+            raise last_exc
+        raise RuntimeError("Model fallback queue exhausted.")
+
     def _generate_mock_reply(self, message: str) -> str:
         """Returns a keyword-matched sustainability coaching reply."""
         msg = message.lower()
@@ -270,13 +301,11 @@ class GeminiAIService:
                 temperature=0.2,
                 max_output_tokens=256
             )
-            response = await self._execute_with_retry(
-                self._client.models.generate_content,
-                model=_MODEL,
+            text = await self._generate_content_with_fallback(
                 contents=[gtypes.Content(role="user", parts=[gtypes.Part(text=prompt)])],
                 config=config,
             )
-            return (response.text or "").strip()
+            return text.strip()
         except Exception as exc:
             logger.error(f"Error generating history summary: {exc}")
             return "The user and EcoPilot previously discussed sustainability habits."
@@ -323,13 +352,12 @@ class GeminiAIService:
                 temperature=0.7,
                 max_output_tokens=1024
             )
-            response = await self._execute_with_retry(
-                self._client.models.generate_content,
-                model=_MODEL,
+            reply = await self._generate_content_with_fallback(
                 contents=contents,
                 config=config,
             )
-            reply = response.text or self._generate_mock_reply(new_message)
+            if not reply:
+                reply = self._generate_mock_reply(new_message)
             chat_response_cache.set(cache_key, reply)
             return reply
 
@@ -392,12 +420,29 @@ class GeminiAIService:
                 max_output_tokens=1024
             )
             accumulated = ""
-            for chunk in self._client.models.generate_content_stream(
-                model=_MODEL, contents=contents, config=config
-            ):
-                if chunk.text:
-                    accumulated += chunk.text
-                    yield chunk.text
+            success = False
+            last_exc = None
+            for model in _MODEL_QUEUE:
+                try:
+                    stream = self._client.models.generate_content_stream(
+                        model=model, contents=contents, config=config
+                    )
+                    for chunk in stream:
+                        if chunk.text:
+                            accumulated += chunk.text
+                            yield chunk.text
+                    success = True
+                    logger.info(f"Successfully streamed content using model: {model}")
+                    break
+                except Exception as exc:
+                    logger.warning(f"Failed to stream with model {model}: {exc}. Trying fallback...")
+                    last_exc = exc
+                    
+            if not success:
+                if last_exc:
+                    raise last_exc
+                else:
+                    raise RuntimeError("Model fallback queue exhausted for streaming.")
             
             chat_response_cache.set(cache_key, accumulated)
 
@@ -469,12 +514,10 @@ class GeminiAIService:
             image_part = gtypes.Part.from_bytes(data=image_bytes, mime_type=mime_type)
             text_part = gtypes.Part(text=prompt)
             contents = [gtypes.Content(role="user", parts=[image_part, text_part])]
-            response = await self._execute_with_retry(
-                self._client.models.generate_content,
-                model=_MODEL,
+            text = await self._generate_content_with_fallback(
                 contents=contents,
             )
-            return response.text or "{}"
+            return text or "{}"
 
         except Exception as exc:
             logger.error(f"Gemini Vision error: {exc}. Falling back to mock analysis.")
@@ -524,14 +567,12 @@ Respond ONLY with a JSON object matching this exact schema – no markdown, no e
                 temperature=0.2,
                 max_output_tokens=1024
             )
-            response = await self._execute_with_retry(
-                self._client.models.generate_content,
-                model=_MODEL,
+            text = await self._generate_content_with_fallback(
                 contents=[gtypes.Content(role="user", parts=[gtypes.Part(text=prompt)])],
                 config=config,
             )
-            logger.info(f"RAW GEMINI RESPONSE: {response.text}")
-            return _safe_json_loads(response.text)
+            logger.info(f"RAW GEMINI RESPONSE: {text}")
+            return _safe_json_loads(text)
 
         except Exception as exc:
             logger.error(f"Gemini sustainability error: {exc}. Falling back to mock response.")
@@ -618,13 +659,11 @@ Respond ONLY with valid JSON matching this schema – no markdown:
                 temperature=0.2,
                 max_output_tokens=1024
             )
-            response = await self._execute_with_retry(
-                self._client.models.generate_content,
-                model=_MODEL,
+            text = await self._generate_content_with_fallback(
                 contents=[gtypes.Content(role="user", parts=[gtypes.Part(text=prompt)])],
                 config=config,
             )
-            return _safe_json_loads(response.text)
+            return _safe_json_loads(text)
 
         except Exception as exc:
             logger.error(f"Gemini twin simulation error: {exc}. Falling back to mock response.")
@@ -693,13 +732,11 @@ Write a concise, encouraging executive summary (max 5 sentences, under 120 words
                 temperature=0.7,
                 max_output_tokens=512
             )
-            response = await self._execute_with_retry(
-                self._client.models.generate_content,
-                model=_MODEL,
+            text = await self._generate_content_with_fallback(
                 contents=[gtypes.Content(role="user", parts=[gtypes.Part(text=prompt)])],
                 config=config,
             )
-            return (response.text or "").strip() or self._mock_report_summary(report_type, trend, achievements)
+            return text.strip() or self._mock_report_summary(report_type, trend, achievements)
 
         except Exception as exc:
             logger.error(f"Gemini report summary error: {exc}")
