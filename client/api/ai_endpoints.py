@@ -171,7 +171,8 @@ async def simulate_twin(payload: TwinSimRequest):
         if toggles.get('stop_flying'): projected_co2 -= 100.0
         if toggles.get('reduce_ac'): projected_co2 -= 30.0
 
-    projected_co2 = max(50.0, projected_co2)
+    baseline_co2 = max(150.0, baseline_co2)
+    projected_co2 = min(baseline_co2, max(50.0, projected_co2))
     reduction_kg = max(0.0, baseline_co2 - projected_co2)
     reduction_pct = (reduction_kg / baseline_co2) * 100 if baseline_co2 > 0 else 0.0
 
