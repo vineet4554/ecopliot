@@ -180,7 +180,7 @@ const generateReport = async (req, res) => {
     ];
 
     // 6. Request AI narrative summary from Gemini
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001';
+    const aiServiceUrl = (process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001').replace(/\/+$/, '');
     let aiSummary = '';
 
     try {

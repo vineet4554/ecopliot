@@ -10,7 +10,7 @@ const scanRoomImage = async (req, res) => {
 
     const userId = req.user._id;
     const roomType = req.body.room_type || 'living_room';
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001';
+    const aiServiceUrl = (process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001').replace(/\/+$/, '');
 
     // 1. Forward to Python AI microservice
     const form = new FormData();

@@ -88,7 +88,7 @@ const assessHabits = async (req, res) => {
     const userId = req.user._id;
     const { travel, food, electricity, waste, water, session_id } = req.body;
 
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001';
+    const aiServiceUrl = (process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001').replace(/\/+$/, '');
 
     let aiResponse;
     try {
@@ -327,7 +327,7 @@ const streamCoachMessage = async (req, res) => {
     let summarizedCount = session.summarized_count || 0;
     const newCount = olderHistory.length;
 
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001';
+    const aiServiceUrl = (process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001').replace(/\/+$/, '');
 
     if (newCount > 0 && (!historySummary || newCount >= summarizedCount + 4)) {
       try {

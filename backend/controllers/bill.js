@@ -80,7 +80,7 @@ const uploadBill = async (req, res) => {
     }
 
     const userId = req.user._id;
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001';
+    const aiServiceUrl = (process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001').replace(/\/+$/, '');
 
     // 1. Forward file to Python AI Service
     const form = new FormData();
