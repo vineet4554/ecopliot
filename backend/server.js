@@ -25,6 +25,7 @@ const allowedOrigins = [
   'http://localhost:8001',
   'http://127.0.0.1:8001',
   'https://carbon-footprint-dun.vercel.app',
+  'https://ecopliot.vercel.app',
 ];
 if (process.env.NEXT_PUBLIC_API_URL) {
   allowedOrigins.push(process.env.NEXT_PUBLIC_API_URL);
@@ -37,7 +38,8 @@ app.use(cors({
     
     // Check if origin matches allowed list or regex
     const isAllowed = allowedOrigins.includes(origin) || 
-                      /https:\/\/carbon-footprint-.*\.vercel\.app/.test(origin);
+                      /https:\/\/carbon-footprint-.*\.vercel\.app/.test(origin) ||
+                      /https:\/\/ecopliot-.*\.vercel\.app/.test(origin);
                       
     if (isAllowed) {
       callback(null, true);
