@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Leaf, Mail, Lock, User, ArrowRight, ShieldAlert, Sparkles } from "lucide-react";
+import { Leaf, Mail, Lock, User, ArrowRight, ShieldAlert, Sparkles, Eye, EyeOff } from "lucide-react";
 import { getBackendUrl } from "../services/api";
 
 export default function Login() {
@@ -11,6 +11,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -163,13 +164,21 @@ export default function Login() {
               </span>
               <input
                 id="password-input"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/80 rounded-xl py-3 pl-10 pr-4 text-xs text-foreground focus:outline-none transition-colors"
+                className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/80 rounded-xl py-3 pl-10 pr-10 text-xs text-foreground focus:outline-none transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-650 dark:text-slate-500 dark:hover:text-slate-400 cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
             {!isLogin && (
               <p id="password-hint" className="text-[10px] text-slate-500 dark:text-slate-500 mt-1">
