@@ -60,7 +60,8 @@ app.get('/', (req, res) => {
   res.json({
     status: 'healthy',
     service: 'EcoPilot AI Node.js Backend',
-    environment: process.env.ENVIRONMENT || 'development'
+    environment: process.env.ENVIRONMENT || 'development',
+    ai_service_url: process.env.AI_SERVICE_URL || 'not set'
   });
 });
 
