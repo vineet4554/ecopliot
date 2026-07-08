@@ -70,6 +70,33 @@ const awardPoints = async (userId, action, customPoints) => {
     }
   }
 
+  // Streak calculations
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (!user.last_activity_date) {
+    user.streak_current = 1;
+    user.streak_longest = 1;
+  } else {
+    const lastAct = new Date(user.last_activity_date);
+    lastAct.setHours(0, 0, 0, 0);
+    
+    // Difference in calendar days
+    const diffTime = today.getTime() - lastAct.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      user.streak_current = (user.streak_current || 0) + 1;
+      if (user.streak_current > (user.streak_longest || 0)) {
+        user.streak_longest = user.streak_current;
+      }
+    } else if (diffDays > 1) {
+      user.streak_current = 1;
+    }
+    // If diffDays === 0, keep current streak
+  }
+  user.last_activity_date = new Date();
+
   user.points = newPoints;
   user.badges = newBadges;
   await user.save();
@@ -137,7 +164,10 @@ const getUserStats = async (userId) => {
     monthly_points: monthlyPoints,
     level,
     xp_in_level,
-    badges
+    badges,
+    streak_current: user.streak_current || 0,
+    streak_longest: user.streak_longest || 0,
+    last_activity_date: user.last_activity_date
   };
 };
 

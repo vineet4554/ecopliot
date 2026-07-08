@@ -6,7 +6,8 @@ const {
   refreshTokens,
   logout,
   requestPasswordReset,
-  confirmPasswordReset
+  confirmPasswordReset,
+  updateProfile
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.post('/refresh', refreshTokens);
 router.post('/logout', logout);
 router.post('/password-reset/request', requestPasswordReset);
 router.post('/password-reset/confirm', confirmPasswordReset);
+router.put('/profile', authMiddleware, updateProfile);
 
 router.get('/me', authMiddleware, (req, res) => {
   const userObj = req.user.toObject();

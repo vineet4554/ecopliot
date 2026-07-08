@@ -268,11 +268,48 @@ const confirmPasswordReset = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { full_name, profile } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ detail: 'User not found.' });
+    }
+
+    if (full_name !== undefined) {
+      user.full_name = full_name;
+    }
+    if (profile !== undefined) {
+      user.profile = {
+        ...user.profile.toObject(),
+        ...profile
+      };
+    }
+
+    await user.save();
+
+    const userObj = user.toObject();
+    userObj._id = userObj._id.toString();
+    delete userObj.password_hash;
+
+    res.json({
+      message: 'Profile updated successfully!',
+      user: userObj
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ detail: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   register,
   login,
   refreshTokens,
   logout,
   requestPasswordReset,
-  confirmPasswordReset
+  confirmPasswordReset,
+  updateProfile
 };

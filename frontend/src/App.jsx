@@ -11,6 +11,7 @@ import Rooms from './pages/Rooms';
 import Challenges from './pages/Challenges';
 import Leaderboard from './pages/Leaderboard';
 import Login from './pages/Login';
+import Profile from './pages/Profile';
 import './App.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

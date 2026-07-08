@@ -44,6 +44,7 @@ export default function Layout() {
     { name: "EcoVision Scanner", href: "/rooms", icon: FileText },
     { name: "Challenges", href: "/challenges", icon: Award },
     { name: "Leaderboard", href: "/leaderboard", icon: BarChart2 },
+    { name: "Profile", href: "/profile", icon: UserIcon },
   ];
 
   return (

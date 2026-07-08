@@ -14,6 +14,9 @@ const UserSchema = new mongoose.Schema({
   profile: { type: ProfileSchema, default: () => ({}) },
   points: { type: Number, default: 0 },
   badges: [{ type: String }],
+  streak_current: { type: Number, default: 0 },
+  streak_longest: { type: Number, default: 0 },
+  last_activity_date: { type: Date },
   created_at: { type: Date, default: Date.now }
 });
 
