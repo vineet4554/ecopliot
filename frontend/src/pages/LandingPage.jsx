@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
-  Leaf, Bot, Compass, Award, Zap, FileText, ArrowRight, Shield, Globe, Sun, Moon
+  Leaf, Bot, Compass, Award, Zap, FileText, ArrowRight, Shield, Sun, Moon
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -93,11 +93,6 @@ export default function LandingPage() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto space-y-6"
         >
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-primary border border-emerald-500/20">
-            <Globe className="w-3.5 h-3.5" />
-            EcoPilot AI Platform v1.2
-          </span>
-
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-foreground">
             Coordinate Your Path to <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500 glow-text">Net Zero</span>
           </h1>

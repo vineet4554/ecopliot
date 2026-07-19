@@ -160,9 +160,6 @@ export default function Layout() {
                 <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold tracking-wide text-center">
-              <span>EcoPilot Platform v1.2</span>
-            </div>
           </div>
         ) : (
           <div className="border-t border-slate-200/80 dark:border-slate-800 pt-4 mt-auto space-y-3">
@@ -173,9 +170,6 @@ export default function Layout() {
               <LogIn className="w-3.5 h-3.5" />
               <span>Authenticate Session</span>
             </Link>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold tracking-wide text-center">
-              <span>EcoPilot Platform v1.2</span>
-            </div>
           </div>
         )}
       </aside>

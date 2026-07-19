@@ -89,7 +89,6 @@ The project is structured into three clean services for maximum modularity and s
 ├── frontend/                   # Vite React frontend application
 │   ├── public/                 # Static assets (images, icons)
 │   ├── src/
-│   │   ├── assets/             # Images & static assets
 │   │   ├── components/         # Reusable layouts & UI widgets
 │   │   ├── pages/              # SPA page components
 │   │   ├── services/           # API fetch and token client
@@ -98,7 +97,6 @@ The project is structured into three clean services for maximum modularity and s
 │   │   └── main.jsx            # React root injection point
 │   ├── vite.config.js          # Vite config server settings
 │   └── package.json            # Frontend dependencies
-├── docker-compose.yml          # Container configuration for local stack
 └── README.md                   # Project documentation
 ```
 
@@ -137,18 +135,6 @@ Vite resolves local API configurations using `import.meta.env.VITE_API_URL`. It 
 ---
 
 ## 🚀 Running the Project Locally
-
-### Option A: Docker Compose (All-in-One)
-To run the full stack (database, microservice, server, and React UI) in containerized environments:
-```bash
-docker-compose up --build
-```
-*   **Vite Frontend:** `http://localhost:3000`
-*   **Express Backend:** `http://localhost:8000`
-*   **FastAPI AI Client:** `http://localhost:8001`
-*   **MongoDB:** `mongodb://localhost:27017`
-
-### Option B: Manual Setup (Development)
 
 1.  **MongoDB**: Start your local MongoDB service listening on Port `27017`.
 2.  **Stateless AI Microservice**:
